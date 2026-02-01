@@ -5,7 +5,8 @@
  */
 
 import { html, nothing, type TemplateResult } from "lit";
-import type { NostrProfile as NostrProfileType } from "../types.ts";
+
+import type { NostrProfile as NostrProfileType } from "../types";
 
 // ============================================================================
 // Types
@@ -81,7 +82,7 @@ export function renderNostrProfileForm(params: {
       placeholder?: string;
       maxLength?: number;
       help?: string;
-    } = {},
+    } = {}
   ) => {
     const { type = "text", placeholder, maxLength, help } = opts;
     const value = state.values[field] ?? "";
@@ -140,15 +141,13 @@ export function renderNostrProfileForm(params: {
 
   const renderPicturePreview = () => {
     const picture = state.values.picture;
-    if (!picture) {
-      return nothing;
-    }
+    if (!picture) return nothing;
 
     return html`
       <div style="margin-bottom: 12px;">
         <img
           src=${picture}
-          alt="Profile picture preview"
+          alt="プロフィール画像プレビュー"
           style="max-width: 80px; max-height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color);"
           @error=${(e: Event) => {
             const img = e.target as HTMLImageElement;
@@ -166,80 +165,74 @@ export function renderNostrProfileForm(params: {
   return html`
     <div class="nostr-profile-form" style="padding: 16px; background: var(--bg-secondary); border-radius: 8px; margin-top: 12px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <div style="font-weight: 600; font-size: 16px;">Edit Profile</div>
-        <div style="font-size: 12px; color: var(--text-muted);">Account: ${accountId}</div>
+        <div style="font-weight: 600; font-size: 16px;">プロフィール編集</div>
+        <div style="font-size: 12px; color: var(--text-muted);">アカウント: ${accountId}</div>
       </div>
 
-      ${
-        state.error
-          ? html`<div class="callout danger" style="margin-bottom: 12px;">${state.error}</div>`
-          : nothing
-      }
+      ${state.error
+        ? html`<div class="callout danger" style="margin-bottom: 12px;">${state.error}</div>`
+        : nothing}
 
-      ${
-        state.success
-          ? html`<div class="callout success" style="margin-bottom: 12px;">${state.success}</div>`
-          : nothing
-      }
+      ${state.success
+        ? html`<div class="callout success" style="margin-bottom: 12px;">${state.success}</div>`
+        : nothing}
 
       ${renderPicturePreview()}
 
-      ${renderField("name", "Username", {
+      ${renderField("name", "ユーザー名", {
         placeholder: "satoshi",
         maxLength: 256,
-        help: "Short username (e.g., satoshi)",
+        help: "短いユーザー名（例: satoshi）",
       })}
 
-      ${renderField("displayName", "Display Name", {
+      ${renderField("displayName", "表示名", {
         placeholder: "Satoshi Nakamoto",
         maxLength: 256,
-        help: "Your full display name",
+        help: "フル表示名",
       })}
 
-      ${renderField("about", "Bio", {
+      ${renderField("about", "自己紹介", {
         type: "textarea",
-        placeholder: "Tell people about yourself...",
+        placeholder: "自己紹介を入力...",
         maxLength: 2000,
-        help: "A brief bio or description",
+        help: "簡単な自己紹介",
       })}
 
-      ${renderField("picture", "Avatar URL", {
+      ${renderField("picture", "アバターURL", {
         type: "url",
         placeholder: "https://example.com/avatar.jpg",
-        help: "HTTPS URL to your profile picture",
+        help: "プロフィール画像のHTTPS URL",
       })}
 
-      ${
-        state.showAdvanced
-          ? html`
+      ${state.showAdvanced
+        ? html`
             <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 12px;">
-              <div style="font-weight: 500; margin-bottom: 12px; color: var(--text-muted);">Advanced</div>
+              <div style="font-weight: 500; margin-bottom: 12px; color: var(--text-muted);">詳細設定</div>
 
-              ${renderField("banner", "Banner URL", {
+              ${renderField("banner", "バナーURL", {
                 type: "url",
                 placeholder: "https://example.com/banner.jpg",
-                help: "HTTPS URL to a banner image",
+                help: "バナー画像のHTTPS URL",
               })}
 
-              ${renderField("website", "Website", {
+              ${renderField("website", "Webサイト", {
                 type: "url",
                 placeholder: "https://example.com",
-                help: "Your personal website",
+                help: "あなたのWebサイト",
               })}
 
-              ${renderField("nip05", "NIP-05 Identifier", {
+              ${renderField("nip05", "NIP-05識別子", {
                 placeholder: "you@example.com",
-                help: "Verifiable identifier (e.g., you@domain.com)",
+                help: "検証可能な識別子（例: you@domain.com）",
               })}
 
-              ${renderField("lud16", "Lightning Address", {
+              ${renderField("lud16", "ライトニングアドレス", {
                 placeholder: "you@getalby.com",
-                help: "Lightning address for tips (LUD-16)",
+                help: "投げ銭用ライトニングアドレス（LUD-16）",
               })}
             </div>
           `
-          : nothing
-      }
+        : nothing}
 
       <div style="display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap;">
         <button
@@ -247,7 +240,7 @@ export function renderNostrProfileForm(params: {
           @click=${callbacks.onSave}
           ?disabled=${state.saving || !isDirty}
         >
-          ${state.saving ? "Saving..." : "Save & Publish"}
+          ${state.saving ? "保存中..." : "保存して公開"}
         </button>
 
         <button
@@ -255,14 +248,14 @@ export function renderNostrProfileForm(params: {
           @click=${callbacks.onImport}
           ?disabled=${state.importing || state.saving}
         >
-          ${state.importing ? "Importing..." : "Import from Relays"}
+          ${state.importing ? "インポート中..." : "リレーからインポート"}
         </button>
 
         <button
           class="btn"
           @click=${callbacks.onToggleAdvanced}
         >
-          ${state.showAdvanced ? "Hide Advanced" : "Show Advanced"}
+          ${state.showAdvanced ? "詳細設定を隠す" : "詳細設定を表示"}
         </button>
 
         <button
@@ -270,19 +263,15 @@ export function renderNostrProfileForm(params: {
           @click=${callbacks.onCancel}
           ?disabled=${state.saving}
         >
-          Cancel
+          キャンセル
         </button>
       </div>
 
-      ${
-        isDirty
-          ? html`
-              <div style="font-size: 12px; color: var(--warning-color); margin-top: 8px">
-                You have unsaved changes
-              </div>
-            `
-          : nothing
-      }
+      ${isDirty
+        ? html`<div style="font-size: 12px; color: var(--warning-color); margin-top: 8px;">
+            未保存の変更があります
+          </div>`
+        : nothing}
     </div>
   `;
 }
@@ -295,7 +284,7 @@ export function renderNostrProfileForm(params: {
  * Create initial form state from existing profile
  */
 export function createNostrProfileFormState(
-  profile: NostrProfileType | undefined,
+  profile: NostrProfileType | undefined
 ): NostrProfileFormState {
   const values: NostrProfileType = {
     name: profile?.name ?? "",
@@ -316,6 +305,8 @@ export function createNostrProfileFormState(
     error: null,
     success: null,
     fieldErrors: {},
-    showAdvanced: Boolean(profile?.banner || profile?.website || profile?.nip05 || profile?.lud16),
+    showAdvanced: Boolean(
+      profile?.banner || profile?.website || profile?.nip05 || profile?.lud16
+    ),
   };
 }

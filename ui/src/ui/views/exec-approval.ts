@@ -1,86 +1,75 @@
 import { html, nothing } from "lit";
-import type { AppViewState } from "../app-view-state.ts";
+
+import type { AppViewState } from "../app-view-state";
 
 function formatRemaining(ms: number): string {
   const remaining = Math.max(0, ms);
   const totalSeconds = Math.floor(remaining / 1000);
-  if (totalSeconds < 60) {
-    return `${totalSeconds}s`;
-  }
+  if (totalSeconds < 60) return `${totalSeconds}s`;
   const minutes = Math.floor(totalSeconds / 60);
-  if (minutes < 60) {
-    return `${minutes}m`;
-  }
+  if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
   return `${hours}h`;
 }
 
 function renderMetaRow(label: string, value?: string | null) {
-  if (!value) {
-    return nothing;
-  }
+  if (!value) return nothing;
   return html`<div class="exec-approval-meta-row"><span>${label}</span><span>${value}</span></div>`;
 }
 
 export function renderExecApprovalPrompt(state: AppViewState) {
   const active = state.execApprovalQueue[0];
-  if (!active) {
-    return nothing;
-  }
+  if (!active) return nothing;
   const request = active.request;
   const remainingMs = active.expiresAtMs - Date.now();
-  const remaining = remainingMs > 0 ? `expires in ${formatRemaining(remainingMs)}` : "expired";
+  const remaining = remainingMs > 0 ? `${formatRemaining(remainingMs)}後に期限切れ` : "期限切れ";
   const queueCount = state.execApprovalQueue.length;
   return html`
     <div class="exec-approval-overlay" role="dialog" aria-live="polite">
       <div class="exec-approval-card">
         <div class="exec-approval-header">
           <div>
-            <div class="exec-approval-title">Exec approval needed</div>
+            <div class="exec-approval-title">実行の承認が必要です</div>
             <div class="exec-approval-sub">${remaining}</div>
           </div>
-          ${
-            queueCount > 1
-              ? html`<div class="exec-approval-queue">${queueCount} pending</div>`
-              : nothing
-          }
+          ${queueCount > 1
+            ? html`<div class="exec-approval-queue">${queueCount}件待機中</div>`
+            : nothing}
         </div>
         <div class="exec-approval-command mono">${request.command}</div>
         <div class="exec-approval-meta">
-          ${renderMetaRow("Host", request.host)}
-          ${renderMetaRow("Agent", request.agentId)}
-          ${renderMetaRow("Session", request.sessionKey)}
-          ${renderMetaRow("CWD", request.cwd)}
-          ${renderMetaRow("Resolved", request.resolvedPath)}
-          ${renderMetaRow("Security", request.security)}
-          ${renderMetaRow("Ask", request.ask)}
+          ${renderMetaRow("ホスト", request.host)}
+          ${renderMetaRow("エージェント", request.agentId)}
+          ${renderMetaRow("セッション", request.sessionKey)}
+          ${renderMetaRow("作業ディレクトリ", request.cwd)}
+          ${renderMetaRow("解決済みパス", request.resolvedPath)}
+          ${renderMetaRow("セキュリティ", request.security)}
+          ${renderMetaRow("確認", request.ask)}
         </div>
-        ${
-          state.execApprovalError
-            ? html`<div class="exec-approval-error">${state.execApprovalError}</div>`
-            : nothing
-        }
+        ${state.execApprovalError
+          ? html`<div class="exec-approval-error">${state.execApprovalError}</div>`
+          : nothing}
         <div class="exec-approval-actions">
           <button
             class="btn primary"
             ?disabled=${state.execApprovalBusy}
             @click=${() => state.handleExecApprovalDecision("allow-once")}
           >
-            Allow once
+            一度だけ許可
           </button>
           <button
             class="btn"
             ?disabled=${state.execApprovalBusy}
             @click=${() => state.handleExecApprovalDecision("allow-always")}
           >
-            Always allow
+            常に許可
           </button>
           <button
             class="btn danger"
             ?disabled=${state.execApprovalBusy}
             @click=${() => state.handleExecApprovalDecision("deny")}
           >
-            Deny
+            拒否
           </button>
         </div>
       </div>

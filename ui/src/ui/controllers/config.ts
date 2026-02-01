@@ -1,13 +1,16 @@
-import type { GatewayBrowserClient } from "../gateway.ts";
-import type { ConfigSchemaResponse, ConfigSnapshot, ConfigUiHints } from "../types.ts";
-import type { JsonSchema } from "../views/config-form.shared.ts";
-import { coerceFormValues } from "./config/form-coerce.ts";
+import type { GatewayBrowserClient } from "../gateway";
+import type {
+  ConfigSchemaResponse,
+  ConfigSnapshot,
+  ConfigUiHints,
+} from "../types";
 import {
   cloneConfigObject,
   removePathValue,
   serializeConfigForm,
   setPathValue,
-} from "./config/form-utils.ts";
+} from "./config/form-utils";
+import { CONFIG_HINTS_JA } from "../i18n/config-hints-ja";
 
 export type ConfigState = {
   client: GatewayBrowserClient | null;
@@ -22,7 +25,7 @@ export type ConfigState = {
   configApplying: boolean;
   updateRunning: boolean;
   configSnapshot: ConfigSnapshot | null;
-  configSchema: unknown;
+  configSchema: unknown | null;
   configSchemaVersion: string | null;
   configSchemaLoading: boolean;
   configUiHints: ConfigUiHints;
@@ -37,13 +40,11 @@ export type ConfigState = {
 };
 
 export async function loadConfig(state: ConfigState) {
-  if (!state.client || !state.connected) {
-    return;
-  }
+  if (!state.client || !state.connected) return;
   state.configLoading = true;
   state.lastError = null;
   try {
-    const res = await state.client.request<ConfigSnapshot>("config.get", {});
+    const res = (await state.client.request("config.get", {})) as ConfigSnapshot;
     applyConfigSnapshot(state, res);
   } catch (err) {
     state.lastError = String(err);
@@ -53,15 +54,14 @@ export async function loadConfig(state: ConfigState) {
 }
 
 export async function loadConfigSchema(state: ConfigState) {
-  if (!state.client || !state.connected) {
-    return;
-  }
-  if (state.configSchemaLoading) {
-    return;
-  }
+  if (!state.client || !state.connected) return;
+  if (state.configSchemaLoading) return;
   state.configSchemaLoading = true;
   try {
-    const res = await state.client.request<ConfigSchemaResponse>("config.schema", {});
+    const res = (await state.client.request(
+      "config.schema",
+      {},
+    )) as ConfigSchemaResponse;
     applyConfigSchema(state, res);
   } catch (err) {
     state.lastError = String(err);
@@ -70,9 +70,23 @@ export async function loadConfigSchema(state: ConfigState) {
   }
 }
 
-export function applyConfigSchema(state: ConfigState, res: ConfigSchemaResponse) {
+export function applyConfigSchema(
+  state: ConfigState,
+  res: ConfigSchemaResponse,
+) {
   state.configSchema = res.schema ?? null;
-  state.configUiHints = res.uiHints ?? {};
+  // Merge server hints with Japanese translations (Japanese takes precedence)
+  const serverHints = res.uiHints ?? {};
+  const mergedHints: ConfigUiHints = { ...serverHints };
+  for (const [key, jaHint] of Object.entries(CONFIG_HINTS_JA)) {
+    if (mergedHints[key]) {
+      // Merge: Japanese overrides server values
+      mergedHints[key] = { ...mergedHints[key], ...jaHint };
+    } else {
+      mergedHints[key] = jaHint;
+    }
+  }
+  state.configUiHints = mergedHints;
   state.configSchemaVersion = res.version ?? null;
 }
 
@@ -82,7 +96,7 @@ export function applyConfigSnapshot(state: ConfigState, snapshot: ConfigSnapshot
     typeof snapshot.raw === "string"
       ? snapshot.raw
       : snapshot.config && typeof snapshot.config === "object"
-        ? serializeConfigForm(snapshot.config)
+        ? serializeConfigForm(snapshot.config as Record<string, unknown>)
         : state.configRaw;
   if (!state.configFormDirty || state.configFormMode === "raw") {
     state.configRaw = rawFromSnapshot;
@@ -101,40 +115,15 @@ export function applyConfigSnapshot(state: ConfigState, snapshot: ConfigSnapshot
   }
 }
 
-function asJsonSchema(value: unknown): JsonSchema | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return null;
-  }
-  return value as JsonSchema;
-}
-
-/**
- * Serialize the form state for submission to `config.set` / `config.apply`.
- *
- * HTML `<input>` elements produce string `.value` properties, so numeric and
- * boolean config fields can leak into `configForm` as strings.  We coerce
- * them back to their schema-defined types before JSON serialization so the
- * gateway's Zod validation always sees correctly typed values.
- */
-function serializeFormForSubmit(state: ConfigState): string {
-  if (state.configFormMode !== "form" || !state.configForm) {
-    return state.configRaw;
-  }
-  const schema = asJsonSchema(state.configSchema);
-  const form = schema
-    ? (coerceFormValues(state.configForm, schema) as Record<string, unknown>)
-    : state.configForm;
-  return serializeConfigForm(form);
-}
-
 export async function saveConfig(state: ConfigState) {
-  if (!state.client || !state.connected) {
-    return;
-  }
+  if (!state.client || !state.connected) return;
   state.configSaving = true;
   state.lastError = null;
   try {
-    const raw = serializeFormForSubmit(state);
+    const raw =
+      state.configFormMode === "form" && state.configForm
+        ? serializeConfigForm(state.configForm)
+        : state.configRaw;
     const baseHash = state.configSnapshot?.hash;
     if (!baseHash) {
       state.lastError = "Config hash missing; reload and retry.";
@@ -151,13 +140,14 @@ export async function saveConfig(state: ConfigState) {
 }
 
 export async function applyConfig(state: ConfigState) {
-  if (!state.client || !state.connected) {
-    return;
-  }
+  if (!state.client || !state.connected) return;
   state.configApplying = true;
   state.lastError = null;
   try {
-    const raw = serializeFormForSubmit(state);
+    const raw =
+      state.configFormMode === "form" && state.configForm
+        ? serializeConfigForm(state.configForm)
+        : state.configRaw;
     const baseHash = state.configSnapshot?.hash;
     if (!baseHash) {
       state.lastError = "Config hash missing; reload and retry.";
@@ -178,9 +168,7 @@ export async function applyConfig(state: ConfigState) {
 }
 
 export async function runUpdate(state: ConfigState) {
-  if (!state.client || !state.connected) {
-    return;
-  }
+  if (!state.client || !state.connected) return;
   state.updateRunning = true;
   state.lastError = null;
   try {
@@ -199,7 +187,9 @@ export function updateConfigFormValue(
   path: Array<string | number>,
   value: unknown,
 ) {
-  const base = cloneConfigObject(state.configForm ?? state.configSnapshot?.config ?? {});
+  const base = cloneConfigObject(
+    state.configForm ?? state.configSnapshot?.config ?? {},
+  );
   setPathValue(base, path, value);
   state.configForm = base;
   state.configFormDirty = true;
@@ -208,8 +198,13 @@ export function updateConfigFormValue(
   }
 }
 
-export function removeConfigFormValue(state: ConfigState, path: Array<string | number>) {
-  const base = cloneConfigObject(state.configForm ?? state.configSnapshot?.config ?? {});
+export function removeConfigFormValue(
+  state: ConfigState,
+  path: Array<string | number>,
+) {
+  const base = cloneConfigObject(
+    state.configForm ?? state.configSnapshot?.config ?? {},
+  );
   removePathValue(base, path);
   state.configForm = base;
   state.configFormDirty = true;
