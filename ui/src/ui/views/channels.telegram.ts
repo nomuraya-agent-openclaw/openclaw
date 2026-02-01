@@ -28,16 +28,16 @@ export function renderTelegramCard(params: {
         </div>
         <div class="status-list account-card-status">
           <div>
-            <span class="label">Running</span>
-            <span>${account.running ? "Yes" : "No"}</span>
+            <span class="label">実行中</span>
+            <span>${account.running ? "はい" : "いいえ"}</span>
           </div>
           <div>
-            <span class="label">Configured</span>
-            <span>${account.configured ? "Yes" : "No"}</span>
+            <span class="label">設定済み</span>
+            <span>${account.configured ? "はい" : "いいえ"}</span>
           </div>
           <div>
-            <span class="label">Last inbound</span>
-            <span>${account.lastInboundAt ? formatAgo(account.lastInboundAt) : "n/a"}</span>
+            <span class="label">最終受信</span>
+            <span>${account.lastInboundAt ? formatAgo(account.lastInboundAt) : "―"}</span>
           </div>
           ${account.lastError
             ? html`
@@ -54,7 +54,7 @@ export function renderTelegramCard(params: {
   return html`
     <div class="card">
       <div class="card-title">Telegram</div>
-      <div class="card-sub">Bot status and channel configuration.</div>
+      <div class="card-sub">Botのステータスとチャンネル設定。</div>
       ${accountCountLabel}
 
       ${hasMultipleAccounts
@@ -66,24 +66,24 @@ export function renderTelegramCard(params: {
         : html`
             <div class="status-list" style="margin-top: 16px;">
               <div>
-                <span class="label">Configured</span>
-                <span>${telegram?.configured ? "Yes" : "No"}</span>
+                <span class="label">設定済み</span>
+                <span>${telegram?.configured ? "はい" : "いいえ"}</span>
               </div>
               <div>
-                <span class="label">Running</span>
-                <span>${telegram?.running ? "Yes" : "No"}</span>
+                <span class="label">実行中</span>
+                <span>${telegram?.running ? "はい" : "いいえ"}</span>
               </div>
               <div>
-                <span class="label">Mode</span>
-                <span>${telegram?.mode ?? "n/a"}</span>
+                <span class="label">モード</span>
+                <span>${telegram?.mode ?? "―"}</span>
               </div>
               <div>
-                <span class="label">Last start</span>
-                <span>${telegram?.lastStartAt ? formatAgo(telegram.lastStartAt) : "n/a"}</span>
+                <span class="label">最終起動</span>
+                <span>${telegram?.lastStartAt ? formatAgo(telegram.lastStartAt) : "―"}</span>
               </div>
               <div>
-                <span class="label">Last probe</span>
-                <span>${telegram?.lastProbeAt ? formatAgo(telegram.lastProbeAt) : "n/a"}</span>
+                <span class="label">最終プローブ</span>
+                <span>${telegram?.lastProbeAt ? formatAgo(telegram.lastProbeAt) : "―"}</span>
               </div>
             </div>
           `}
@@ -96,7 +96,7 @@ export function renderTelegramCard(params: {
 
       ${telegram?.probe
         ? html`<div class="callout" style="margin-top: 12px;">
-            Probe ${telegram.probe.ok ? "ok" : "failed"} ·
+            プローブ ${telegram.probe.ok ? "成功" : "失敗"} ·
             ${telegram.probe.status ?? ""} ${telegram.probe.error ?? ""}
           </div>`
         : nothing}
@@ -105,7 +105,7 @@ export function renderTelegramCard(params: {
 
       <div class="row" style="margin-top: 12px;">
         <button class="btn" @click=${() => props.onRefresh(true)}>
-          Probe
+          プローブ
         </button>
       </div>
     </div>

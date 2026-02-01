@@ -77,10 +77,10 @@ export function renderChannels(props: ChannelsProps) {
     <section class="card" style="margin-top: 18px;">
       <div class="row" style="justify-content: space-between;">
         <div>
-          <div class="card-title">Channel health</div>
-          <div class="card-sub">Channel status snapshots from the gateway.</div>
+          <div class="card-title">チャンネルヘルス</div>
+          <div class="card-sub">ゲートウェイからのチャンネルステータススナップショット。</div>
         </div>
-        <div class="muted">${props.lastSuccessAt ? formatAgo(props.lastSuccessAt) : "n/a"}</div>
+        <div class="muted">${props.lastSuccessAt ? formatAgo(props.lastSuccessAt) : "―"}</div>
       </div>
       ${props.lastError
         ? html`<div class="callout danger" style="margin-top: 12px;">
@@ -88,7 +88,7 @@ export function renderChannels(props: ChannelsProps) {
           </div>`
         : nothing}
       <pre class="code-block" style="margin-top: 12px;">
-${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "No snapshot yet."}
+${props.snapshot ? JSON.stringify(props.snapshot, null, 2) : "スナップショットがありません。"}
       </pre>
     </section>
   `;
@@ -215,7 +215,7 @@ function renderGenericChannelCard(
   return html`
     <div class="card">
       <div class="card-title">${label}</div>
-      <div class="card-sub">Channel status and configuration.</div>
+      <div class="card-sub">チャンネルのステータスと設定。</div>
       ${accountCountLabel}
 
       ${accounts.length > 0
@@ -227,16 +227,16 @@ function renderGenericChannelCard(
         : html`
             <div class="status-list" style="margin-top: 16px;">
               <div>
-                <span class="label">Configured</span>
-                <span>${configured == null ? "n/a" : configured ? "Yes" : "No"}</span>
+                <span class="label">設定済み</span>
+                <span>${configured == null ? "―" : configured ? "はい" : "いいえ"}</span>
               </div>
               <div>
-                <span class="label">Running</span>
-                <span>${running == null ? "n/a" : running ? "Yes" : "No"}</span>
+                <span class="label">実行中</span>
+                <span>${running == null ? "―" : running ? "はい" : "いいえ"}</span>
               </div>
               <div>
-                <span class="label">Connected</span>
-                <span>${connected == null ? "n/a" : connected ? "Yes" : "No"}</span>
+                <span class="label">接続中</span>
+                <span>${connected == null ? "―" : connected ? "はい" : "いいえ"}</span>
               </div>
             </div>
           `}
@@ -274,19 +274,19 @@ function hasRecentActivity(account: ChannelAccountSnapshot): boolean {
   return Date.now() - account.lastInboundAt < RECENT_ACTIVITY_THRESHOLD_MS;
 }
 
-function deriveRunningStatus(account: ChannelAccountSnapshot): "Yes" | "No" | "Active" {
-  if (account.running) return "Yes";
+function deriveRunningStatus(account: ChannelAccountSnapshot): "はい" | "いいえ" | "アクティブ" {
+  if (account.running) return "はい";
   // If we have recent inbound activity, the channel is effectively running
-  if (hasRecentActivity(account)) return "Active";
-  return "No";
+  if (hasRecentActivity(account)) return "アクティブ";
+  return "いいえ";
 }
 
-function deriveConnectedStatus(account: ChannelAccountSnapshot): "Yes" | "No" | "Active" | "n/a" {
-  if (account.connected === true) return "Yes";
-  if (account.connected === false) return "No";
+function deriveConnectedStatus(account: ChannelAccountSnapshot): "はい" | "いいえ" | "アクティブ" | "―" {
+  if (account.connected === true) return "はい";
+  if (account.connected === false) return "いいえ";
   // If connected is null/undefined but we have recent activity, show as active
-  if (hasRecentActivity(account)) return "Active";
-  return "n/a";
+  if (hasRecentActivity(account)) return "アクティブ";
+  return "―";
 }
 
 function renderGenericAccount(account: ChannelAccountSnapshot) {
@@ -301,20 +301,20 @@ function renderGenericAccount(account: ChannelAccountSnapshot) {
       </div>
       <div class="status-list account-card-status">
         <div>
-          <span class="label">Running</span>
+          <span class="label">実行中</span>
           <span>${runningStatus}</span>
         </div>
         <div>
-          <span class="label">Configured</span>
-          <span>${account.configured ? "Yes" : "No"}</span>
+          <span class="label">設定済み</span>
+          <span>${account.configured ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Connected</span>
+          <span class="label">接続中</span>
           <span>${connectedStatus}</span>
         </div>
         <div>
-          <span class="label">Last inbound</span>
-          <span>${account.lastInboundAt ? formatAgo(account.lastInboundAt) : "n/a"}</span>
+          <span class="label">最終受信</span>
+          <span>${account.lastInboundAt ? formatAgo(account.lastInboundAt) : "―"}</span>
         </div>
         ${account.lastError
           ? html`

@@ -56,7 +56,7 @@ export function renderNode(params: {
   if (unsupported.has(key)) {
     return html`<div class="cfg-field cfg-field--error">
       <div class="cfg-field__label">${label}</div>
-      <div class="cfg-field__error">Unsupported schema node. Use Raw mode.</div>
+      <div class="cfg-field__error">サポートされていないスキーマノードです。Rawモードを使用してください。</div>
     </div>`;
   }
 
@@ -210,7 +210,7 @@ export function renderNode(params: {
   return html`
     <div class="cfg-field cfg-field--error">
       <div class="cfg-field__label">${label}</div>
-      <div class="cfg-field__error">Unsupported type: ${type}. Use Raw mode.</div>
+      <div class="cfg-field__error">サポートされていない型: ${type}。Rawモードを使用してください。</div>
     </div>
   `;
 }
@@ -233,7 +233,7 @@ function renderTextInput(params: {
   const isSensitive = hint?.sensitive ?? isSensitivePath(path);
   const placeholder =
     hint?.placeholder ??
-    (isSensitive ? "••••" : schema.default !== undefined ? `Default: ${schema.default}` : "");
+    (isSensitive ? "••••" : schema.default !== undefined ? `デフォルト: ${schema.default}` : "");
   const displayValue = value ?? "";
 
   return html`
@@ -270,7 +270,7 @@ function renderTextInput(params: {
           <button
             type="button"
             class="cfg-input__reset"
-            title="Reset to default"
+            title="デフォルトにリセット"
             ?disabled=${disabled}
             @click=${() => onPatch(path, schema.default)}
           >↺</button>
@@ -364,7 +364,7 @@ function renderSelect(params: {
           onPatch(path, val === unset ? undefined : options[Number(val)]);
         }}
       >
-        <option value=${unset}>Select...</option>
+        <option value=${unset}>選択...</option>
         ${options.map((opt, idx) => html`
           <option value=${String(idx)}>${String(opt)}</option>
         `)}
@@ -493,7 +493,7 @@ function renderArray(params: {
     return html`
       <div class="cfg-field cfg-field--error">
         <div class="cfg-field__label">${label}</div>
-        <div class="cfg-field__error">Unsupported array schema. Use Raw mode.</div>
+        <div class="cfg-field__error">サポートされていない配列スキーマです。Rawモードを使用してください。</div>
       </div>
     `;
   }
@@ -504,7 +504,7 @@ function renderArray(params: {
     <div class="cfg-array">
       <div class="cfg-array__header">
         ${showLabel ? html`<span class="cfg-array__label">${label}</span>` : nothing}
-        <span class="cfg-array__count">${arr.length} item${arr.length !== 1 ? 's' : ''}</span>
+        <span class="cfg-array__count">${arr.length}件</span>
         <button
           type="button"
           class="cfg-array__add"
@@ -515,14 +515,14 @@ function renderArray(params: {
           }}
         >
           <span class="cfg-array__add-icon">${icons.plus}</span>
-          Add
+          追加
         </button>
       </div>
       ${help ? html`<div class="cfg-array__help">${help}</div>` : nothing}
 
       ${arr.length === 0 ? html`
         <div class="cfg-array__empty">
-          No items yet. Click "Add" to create one.
+          まだアイテムがありません。「追加」をクリックして作成してください。
         </div>
       ` : html`
         <div class="cfg-array__items">
@@ -533,7 +533,7 @@ function renderArray(params: {
                 <button
                   type="button"
                   class="cfg-array__item-remove"
-                  title="Remove item"
+                  title="アイテムを削除"
                   ?disabled=${disabled}
                   @click=${() => {
                     const next = [...arr];
@@ -581,7 +581,7 @@ function renderMapField(params: {
   return html`
     <div class="cfg-map">
       <div class="cfg-map__header">
-        <span class="cfg-map__label">Custom entries</span>
+        <span class="cfg-map__label">カスタムエントリ</span>
         <button
           type="button"
           class="cfg-map__add"
@@ -599,12 +599,12 @@ function renderMapField(params: {
           }}
         >
           <span class="cfg-map__add-icon">${icons.plus}</span>
-          Add Entry
+          エントリを追加
         </button>
       </div>
 
       ${entries.length === 0 ? html`
-        <div class="cfg-map__empty">No custom entries.</div>
+        <div class="cfg-map__empty">カスタムエントリがありません。</div>
       ` : html`
         <div class="cfg-map__items">
           ${entries.map(([key, entryValue]) => {
@@ -616,7 +616,7 @@ function renderMapField(params: {
                   <input
                     type="text"
                     class="cfg-input cfg-input--sm"
-                    placeholder="Key"
+                    placeholder="キー"
                     .value=${key}
                     ?disabled=${disabled}
                     @change=${(e: Event) => {
@@ -635,7 +635,7 @@ function renderMapField(params: {
                     ? html`
                         <textarea
                           class="cfg-textarea cfg-textarea--sm"
-                          placeholder="JSON value"
+                          placeholder="JSON値"
                           rows="2"
                           .value=${fallback}
                           ?disabled=${disabled}
@@ -668,7 +668,7 @@ function renderMapField(params: {
                 <button
                   type="button"
                   class="cfg-map__item-remove"
-                  title="Remove entry"
+                  title="エントリを削除"
                   ?disabled=${disabled}
                   @click=${() => {
                     const next = { ...(value ?? {}) };

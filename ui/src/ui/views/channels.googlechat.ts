@@ -15,37 +15,37 @@ export function renderGoogleChatCard(params: {
   return html`
     <div class="card">
       <div class="card-title">Google Chat</div>
-      <div class="card-sub">Chat API webhook status and channel configuration.</div>
+      <div class="card-sub">Chat APIウェブフックのステータスとチャンネル設定。</div>
       ${accountCountLabel}
 
       <div class="status-list" style="margin-top: 16px;">
         <div>
-          <span class="label">Configured</span>
-          <span>${googleChat ? (googleChat.configured ? "Yes" : "No") : "n/a"}</span>
+          <span class="label">設定済み</span>
+          <span>${googleChat ? (googleChat.configured ? "はい" : "いいえ") : "―"}</span>
         </div>
         <div>
-          <span class="label">Running</span>
-          <span>${googleChat ? (googleChat.running ? "Yes" : "No") : "n/a"}</span>
+          <span class="label">実行中</span>
+          <span>${googleChat ? (googleChat.running ? "はい" : "いいえ") : "―"}</span>
         </div>
         <div>
-          <span class="label">Credential</span>
-          <span>${googleChat?.credentialSource ?? "n/a"}</span>
+          <span class="label">認証情報</span>
+          <span>${googleChat?.credentialSource ?? "―"}</span>
         </div>
         <div>
-          <span class="label">Audience</span>
+          <span class="label">オーディエンス</span>
           <span>
             ${googleChat?.audienceType
               ? `${googleChat.audienceType}${googleChat.audience ? ` · ${googleChat.audience}` : ""}`
-              : "n/a"}
+              : "―"}
           </span>
         </div>
         <div>
-          <span class="label">Last start</span>
-          <span>${googleChat?.lastStartAt ? formatAgo(googleChat.lastStartAt) : "n/a"}</span>
+          <span class="label">最終起動</span>
+          <span>${googleChat?.lastStartAt ? formatAgo(googleChat.lastStartAt) : "―"}</span>
         </div>
         <div>
-          <span class="label">Last probe</span>
-          <span>${googleChat?.lastProbeAt ? formatAgo(googleChat.lastProbeAt) : "n/a"}</span>
+          <span class="label">最終プローブ</span>
+          <span>${googleChat?.lastProbeAt ? formatAgo(googleChat.lastProbeAt) : "―"}</span>
         </div>
       </div>
 
@@ -57,7 +57,7 @@ export function renderGoogleChatCard(params: {
 
       ${googleChat?.probe
         ? html`<div class="callout" style="margin-top: 12px;">
-            Probe ${googleChat.probe.ok ? "ok" : "failed"} ·
+            プローブ ${googleChat.probe.ok ? "成功" : "失敗"} ·
             ${googleChat.probe.status ?? ""} ${googleChat.probe.error ?? ""}
           </div>`
         : nothing}
@@ -66,7 +66,7 @@ export function renderGoogleChatCard(params: {
 
       <div class="row" style="margin-top: 12px;">
         <button class="btn" @click=${() => props.onRefresh(true)}>
-          Probe
+          プローブ
         </button>
       </div>
     </div>

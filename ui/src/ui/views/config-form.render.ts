@@ -37,6 +37,7 @@ const sectionIcons = {
   wizard: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 4V2"></path><path d="M15 16v-2"></path><path d="M8 9h2"></path><path d="M20 9h2"></path><path d="M17.8 11.8 19 13"></path><path d="M15 9h0"></path><path d="M17.8 6.2 19 5"></path><path d="m3 21 9-9"></path><path d="M12.2 6.2 11 5"></path></svg>`,
   // Additional sections
   meta: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>`,
+  diagnostics: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>`,
   logging: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
   browser: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>`,
   ui: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>`,
@@ -51,39 +52,81 @@ const sectionIcons = {
   canvasHost: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>`,
   talk: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>`,
   plugins: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v6"></path><path d="m4.93 10.93 4.24 4.24"></path><path d="M2 12h6"></path><path d="m4.93 13.07 4.24-4.24"></path><path d="M12 22v-6"></path><path d="m19.07 13.07-4.24-4.24"></path><path d="M22 12h-6"></path><path d="m19.07 10.93-4.24 4.24"></path></svg>`,
+  media: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>`,
   default: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>`,
 };
 
 // Section metadata
 export const SECTION_META: Record<string, { label: string; description: string }> = {
-  env: { label: "Environment Variables", description: "Environment variables passed to the gateway process" },
-  update: { label: "Updates", description: "Auto-update settings and release channel" },
-  agents: { label: "Agents", description: "Agent configurations, models, and identities" },
-  auth: { label: "Authentication", description: "API keys and authentication profiles" },
-  channels: { label: "Channels", description: "Messaging channels (Telegram, Discord, Slack, etc.)" },
-  messages: { label: "Messages", description: "Message handling and routing settings" },
-  commands: { label: "Commands", description: "Custom slash commands" },
-  hooks: { label: "Hooks", description: "Webhooks and event hooks" },
-  skills: { label: "Skills", description: "Skill packs and capabilities" },
-  tools: { label: "Tools", description: "Tool configurations (browser, search, etc.)" },
-  gateway: { label: "Gateway", description: "Gateway server settings (port, auth, binding)" },
-  wizard: { label: "Setup Wizard", description: "Setup wizard state and history" },
+  env: { label: "環境変数", description: "ゲートウェイプロセスに渡される環境変数" },
+  update: { label: "アップデート", description: "自動更新設定とリリースチャンネル" },
+  agents: { label: "エージェント", description: "エージェントの設定、モデル、アイデンティティ" },
+  auth: { label: "認証", description: "APIキーと認証プロファイル" },
+  channels: { label: "チャンネル", description: "メッセージングチャンネル（Telegram、Discord、Slackなど）" },
+  messages: { label: "メッセージ", description: "メッセージ処理とルーティング設定" },
+  commands: { label: "コマンド", description: "カスタムスラッシュコマンド" },
+  hooks: { label: "フック", description: "Webhookとイベントフック" },
+  skills: { label: "スキル", description: "スキルパックと機能" },
+  tools: { label: "ツール", description: "ツール設定（ブラウザ、検索など）" },
+  gateway: { label: "ゲートウェイ", description: "ゲートウェイサーバー設定（ポート、認証、バインディング）" },
+  wizard: { label: "セットアップウィザード", description: "セットアップウィザードの状態と履歴" },
   // Additional sections
-  meta: { label: "Metadata", description: "Gateway metadata and version information" },
-  logging: { label: "Logging", description: "Log levels and output configuration" },
-  browser: { label: "Browser", description: "Browser automation settings" },
-  ui: { label: "UI", description: "User interface preferences" },
-  models: { label: "Models", description: "AI model configurations and providers" },
-  bindings: { label: "Bindings", description: "Key bindings and shortcuts" },
-  broadcast: { label: "Broadcast", description: "Broadcast and notification settings" },
-  audio: { label: "Audio", description: "Audio input/output settings" },
-  session: { label: "Session", description: "Session management and persistence" },
-  cron: { label: "Cron", description: "Scheduled tasks and automation" },
-  web: { label: "Web", description: "Web server and API settings" },
-  discovery: { label: "Discovery", description: "Service discovery and networking" },
-  canvasHost: { label: "Canvas Host", description: "Canvas rendering and display" },
-  talk: { label: "Talk", description: "Voice and speech settings" },
-  plugins: { label: "Plugins", description: "Plugin management and extensions" },
+  meta: { label: "メタデータ", description: "ゲートウェイのメタデータとバージョン情報" },
+  Meta: { label: "メタデータ", description: "ゲートウェイのメタデータとバージョン情報" },
+  diagnostics: { label: "診断", description: "診断とトレース設定" },
+  Diagnostics: { label: "診断", description: "診断とトレース設定" },
+  logging: { label: "ログ", description: "ログレベルと出力設定" },
+  Logging: { label: "ログ", description: "ログレベルと出力設定" },
+  browser: { label: "ブラウザ", description: "ブラウザ自動化設定" },
+  Browser: { label: "ブラウザ", description: "ブラウザ自動化設定" },
+  ui: { label: "UI", description: "ユーザーインターフェース設定" },
+  UI: { label: "UI", description: "ユーザーインターフェース設定" },
+  models: { label: "モデル", description: "AIモデルの設定とプロバイダー" },
+  bindings: { label: "バインディング", description: "キーバインディングとショートカット" },
+  broadcast: { label: "ブロードキャスト", description: "ブロードキャストと通知設定" },
+  audio: { label: "オーディオ", description: "オーディオ入出力設定" },
+  session: { label: "セッション", description: "セッション管理と永続化" },
+  cron: { label: "Cron", description: "スケジュールタスクと自動化" },
+  web: { label: "Web", description: "Webサーバーと API設定" },
+  discovery: { label: "ディスカバリ", description: "サービス検出とネットワーキング" },
+  canvasHost: { label: "Canvasホスト", description: "Canvasレンダリングと表示" },
+  talk: { label: "トーク", description: "音声とスピーチ設定" },
+  plugins: { label: "プラグイン", description: "プラグイン管理と拡張機能" },
+  media: { label: "メディア", description: "画像・動画・ファイル処理設定" },
+  // Capitalized variants (schema may use different casing)
+  Models: { label: "モデル", description: "AIモデルの設定とプロバイダー" },
+  Bindings: { label: "バインディング", description: "キーバインディングとショートカット" },
+  Broadcast: { label: "ブロードキャスト", description: "ブロードキャストと通知設定" },
+  Audio: { label: "オーディオ", description: "オーディオ入出力設定" },
+  Media: { label: "メディア", description: "画像・動画・ファイル処理設定" },
+  Session: { label: "セッション", description: "セッション管理と永続化" },
+  Cron: { label: "Cron", description: "スケジュールタスクと自動化" },
+  Web: { label: "Web", description: "Webサーバーと API設定" },
+  Discovery: { label: "ディスカバリ", description: "サービス検出とネットワーキング" },
+  CanvasHost: { label: "Canvasホスト", description: "Canvasレンダリングと表示" },
+  Talk: { label: "トーク", description: "音声とスピーチ設定" },
+  Plugins: { label: "プラグイン", description: "プラグイン管理と拡張機能" },
+  Agents: { label: "エージェント", description: "エージェントの設定、モデル、アイデンティティ" },
+  Auth: { label: "認証", description: "APIキーと認証プロファイル" },
+  Channels: { label: "チャンネル", description: "メッセージングチャンネル（Telegram、Discord、Slackなど）" },
+  Messages: { label: "メッセージ", description: "メッセージ処理とルーティング設定" },
+  Commands: { label: "コマンド", description: "カスタムスラッシュコマンド" },
+  Hooks: { label: "フック", description: "Webhookとイベントフック" },
+  Skills: { label: "スキル", description: "スキルパックと機能" },
+  Tools: { label: "ツール", description: "ツール設定（ブラウザ、検索など）" },
+  Gateway: { label: "ゲートウェイ", description: "ゲートウェイサーバー設定（ポート、認証、バインディング）" },
+  Env: { label: "環境変数", description: "ゲートウェイプロセスに渡される環境変数" },
+  Update: { label: "アップデート", description: "自動更新設定とリリースチャンネル" },
+  Wizard: { label: "セットアップウィザード", description: "セットアップウィザードの状態と履歴" },
+  // Messages subsections
+  ackReactionEmoji: { label: "確認リアクション絵文字", description: "受信メッセージの確認に使用するリアクション絵文字" },
+  ackReactionScope: { label: "確認リアクションスコープ", description: "確認リアクションの適用範囲" },
+  groupChat: { label: "グループチャット", description: "グループチャット設定" },
+  inbound: { label: "受信", description: "受信メッセージ設定" },
+  messagePrefix: { label: "メッセージプレフィックス", description: "メッセージのプレフィックス設定" },
+  queue: { label: "キュー", description: "メッセージキュー設定" },
+  removeAckAfterReply: { label: "返信後に確認を削除", description: "返信後にリアクションを削除するかどうか" },
+  responsePrefix: { label: "応答プレフィックス", description: "応答メッセージのプレフィックス" },
 };
 
 function getSectionIcon(key: string) {
@@ -142,12 +185,12 @@ function schemaMatches(schema: JsonSchema, query: string): boolean {
 
 export function renderConfigForm(props: ConfigFormProps) {
   if (!props.schema) {
-    return html`<div class="muted">Schema unavailable.</div>`;
+    return html`<div class="muted">スキーマが利用できません。</div>`;
   }
   const schema = props.schema;
   const value = props.value ?? {};
   if (schemaType(schema) !== "object" || !schema.properties) {
-    return html`<div class="callout danger">Unsupported schema. Use Raw.</div>`;
+    return html`<div class="callout danger">サポートされていないスキーマです。Rawを使用してください。</div>`;
   }
   const unsupported = new Set(props.unsupportedPaths ?? []);
   const properties = schema.properties;
@@ -193,8 +236,8 @@ export function renderConfigForm(props: ConfigFormProps) {
         <div class="config-empty__icon">${icons.search}</div>
         <div class="config-empty__text">
           ${searchQuery
-            ? `No settings match "${searchQuery}"`
-            : "No settings in this section"}
+            ? `「${searchQuery}」に一致する設定がありません`
+            : "このセクションに設定がありません"}
         </div>
       </div>
     `;

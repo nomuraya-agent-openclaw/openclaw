@@ -15,29 +15,29 @@ export function renderSignalCard(params: {
   return html`
     <div class="card">
       <div class="card-title">Signal</div>
-      <div class="card-sub">signal-cli status and channel configuration.</div>
+      <div class="card-sub">signal-cliのステータスとチャンネル設定。</div>
       ${accountCountLabel}
 
       <div class="status-list" style="margin-top: 16px;">
         <div>
-          <span class="label">Configured</span>
-          <span>${signal?.configured ? "Yes" : "No"}</span>
+          <span class="label">設定済み</span>
+          <span>${signal?.configured ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Running</span>
-          <span>${signal?.running ? "Yes" : "No"}</span>
+          <span class="label">実行中</span>
+          <span>${signal?.running ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Base URL</span>
-          <span>${signal?.baseUrl ?? "n/a"}</span>
+          <span class="label">ベースURL</span>
+          <span>${signal?.baseUrl ?? "―"}</span>
         </div>
         <div>
-          <span class="label">Last start</span>
-          <span>${signal?.lastStartAt ? formatAgo(signal.lastStartAt) : "n/a"}</span>
+          <span class="label">最終起動</span>
+          <span>${signal?.lastStartAt ? formatAgo(signal.lastStartAt) : "―"}</span>
         </div>
         <div>
-          <span class="label">Last probe</span>
-          <span>${signal?.lastProbeAt ? formatAgo(signal.lastProbeAt) : "n/a"}</span>
+          <span class="label">最終プローブ</span>
+          <span>${signal?.lastProbeAt ? formatAgo(signal.lastProbeAt) : "―"}</span>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export function renderSignalCard(params: {
 
       ${signal?.probe
         ? html`<div class="callout" style="margin-top: 12px;">
-            Probe ${signal.probe.ok ? "ok" : "failed"} ·
+            プローブ ${signal.probe.ok ? "成功" : "失敗"} ·
             ${signal.probe.status ?? ""} ${signal.probe.error ?? ""}
           </div>`
         : nothing}
@@ -58,7 +58,7 @@ export function renderSignalCard(params: {
 
       <div class="row" style="margin-top: 12px;">
         <button class="btn" @click=${() => props.onRefresh(true)}>
-          Probe
+          プローブ
         </button>
       </div>
     </div>

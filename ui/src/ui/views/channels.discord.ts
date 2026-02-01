@@ -15,25 +15,25 @@ export function renderDiscordCard(params: {
   return html`
     <div class="card">
       <div class="card-title">Discord</div>
-      <div class="card-sub">Bot status and channel configuration.</div>
+      <div class="card-sub">Botのステータスとチャンネル設定。</div>
       ${accountCountLabel}
 
       <div class="status-list" style="margin-top: 16px;">
         <div>
-          <span class="label">Configured</span>
-          <span>${discord?.configured ? "Yes" : "No"}</span>
+          <span class="label">設定済み</span>
+          <span>${discord?.configured ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Running</span>
-          <span>${discord?.running ? "Yes" : "No"}</span>
+          <span class="label">実行中</span>
+          <span>${discord?.running ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Last start</span>
-          <span>${discord?.lastStartAt ? formatAgo(discord.lastStartAt) : "n/a"}</span>
+          <span class="label">最終起動</span>
+          <span>${discord?.lastStartAt ? formatAgo(discord.lastStartAt) : "―"}</span>
         </div>
         <div>
-          <span class="label">Last probe</span>
-          <span>${discord?.lastProbeAt ? formatAgo(discord.lastProbeAt) : "n/a"}</span>
+          <span class="label">最終プローブ</span>
+          <span>${discord?.lastProbeAt ? formatAgo(discord.lastProbeAt) : "―"}</span>
         </div>
       </div>
 
@@ -45,7 +45,7 @@ export function renderDiscordCard(params: {
 
       ${discord?.probe
         ? html`<div class="callout" style="margin-top: 12px;">
-            Probe ${discord.probe.ok ? "ok" : "failed"} ·
+            プローブ ${discord.probe.ok ? "成功" : "失敗"} ·
             ${discord.probe.status ?? ""} ${discord.probe.error ?? ""}
           </div>`
         : nothing}
@@ -54,7 +54,7 @@ export function renderDiscordCard(params: {
 
       <div class="row" style="margin-top: 12px;">
         <button class="btn" @click=${() => props.onRefresh(true)}>
-          Probe
+          プローブ
         </button>
       </div>
     </div>

@@ -33,14 +33,43 @@ export type SessionsProps = {
   onDelete: (key: string) => void;
 };
 
-const THINK_LEVELS = ["", "off", "minimal", "low", "medium", "high"] as const;
-const BINARY_THINK_LEVELS = ["", "off", "on"] as const;
-const VERBOSE_LEVELS = [
-  { value: "", label: "inherit" },
-  { value: "off", label: "off (explicit)" },
-  { value: "on", label: "on" },
+const THINK_LEVELS = [
+  { value: "", label: "継承" },
+  { value: "off", label: "オフ" },
+  { value: "minimal", label: "最小" },
+  { value: "low", label: "低" },
+  { value: "medium", label: "中" },
+  { value: "high", label: "高" },
 ] as const;
-const REASONING_LEVELS = ["", "off", "on", "stream"] as const;
+const BINARY_THINK_LEVELS = [
+  { value: "", label: "継承" },
+  { value: "off", label: "オフ" },
+  { value: "on", label: "オン" },
+] as const;
+const VERBOSE_LEVELS = [
+  { value: "", label: "継承" },
+  { value: "off", label: "オフ（明示）" },
+  { value: "on", label: "オン" },
+] as const;
+const REASONING_LEVELS = [
+  { value: "", label: "継承" },
+  { value: "off", label: "オフ" },
+  { value: "on", label: "オン" },
+  { value: "stream", label: "ストリーム" },
+] as const;
+
+const KIND_LABELS: Record<string, string> = {
+  global: "グローバル",
+  user: "ユーザー",
+  device: "デバイス",
+  channel: "チャンネル",
+  unknown: "不明",
+};
+
+function formatKind(kind: string | null | undefined): string {
+  if (!kind) return "―";
+  return KIND_LABELS[kind] ?? kind;
+}
 
 function normalizeProviderId(provider?: string | null): string {
   if (!provider) return "";
@@ -53,7 +82,7 @@ function isBinaryThinkingProvider(provider?: string | null): boolean {
   return normalizeProviderId(provider) === "zai";
 }
 
-function resolveThinkLevelOptions(provider?: string | null): readonly string[] {
+function resolveThinkLevelOptions(provider?: string | null): readonly { value: string; label: string }[] {
   return isBinaryThinkingProvider(provider) ? BINARY_THINK_LEVELS : THINK_LEVELS;
 }
 
@@ -76,17 +105,17 @@ export function renderSessions(props: SessionsProps) {
     <section class="card">
       <div class="row" style="justify-content: space-between;">
         <div>
-          <div class="card-title">Sessions</div>
-          <div class="card-sub">Active session keys and per-session overrides.</div>
+          <div class="card-title">セッション</div>
+          <div class="card-sub">アクティブなセッションキーとセッションごとの設定オーバーライド。</div>
         </div>
         <button class="btn" ?disabled=${props.loading} @click=${props.onRefresh}>
-          ${props.loading ? "Loading…" : "Refresh"}
+          ${props.loading ? "読み込み中…" : "更新"}
         </button>
       </div>
 
       <div class="filters" style="margin-top: 14px;">
         <label class="field">
-          <span>Active within (minutes)</span>
+          <span>アクティブ期間（分）</span>
           <input
             .value=${props.activeMinutes}
             @input=${(e: Event) =>
@@ -99,7 +128,7 @@ export function renderSessions(props: SessionsProps) {
           />
         </label>
         <label class="field">
-          <span>Limit</span>
+          <span>件数制限</span>
           <input
             .value=${props.limit}
             @input=${(e: Event) =>
@@ -112,7 +141,7 @@ export function renderSessions(props: SessionsProps) {
           />
         </label>
         <label class="field checkbox">
-          <span>Include global</span>
+          <span>グローバルを含む</span>
           <input
             type="checkbox"
             .checked=${props.includeGlobal}
@@ -126,7 +155,7 @@ export function renderSessions(props: SessionsProps) {
           />
         </label>
         <label class="field checkbox">
-          <span>Include unknown</span>
+          <span>不明を含む</span>
           <input
             type="checkbox"
             .checked=${props.includeUnknown}
@@ -146,23 +175,23 @@ export function renderSessions(props: SessionsProps) {
         : nothing}
 
       <div class="muted" style="margin-top: 12px;">
-        ${props.result ? `Store: ${props.result.path}` : ""}
+        ${props.result ? `ストア: ${props.result.path}` : ""}
       </div>
 
       <div class="table" style="margin-top: 16px;">
         <div class="table-head">
-          <div>Key</div>
-          <div>Label</div>
-          <div>Kind</div>
-          <div>Updated</div>
-          <div>Tokens</div>
-          <div>Thinking</div>
-          <div>Verbose</div>
-          <div>Reasoning</div>
-          <div>Actions</div>
+          <div>キー</div>
+          <div>ラベル</div>
+          <div>種類</div>
+          <div>更新日時</div>
+          <div>トークン</div>
+          <div>思考</div>
+          <div>詳細</div>
+          <div>推論</div>
+          <div>操作</div>
         </div>
         ${rows.length === 0
-          ? html`<div class="muted">No sessions found.</div>`
+          ? html`<div class="muted">セッションが見つかりません。</div>`
           : rows.map((row) =>
               renderRow(row, props.basePath, props.onPatch, props.onDelete, props.loading),
             )}
@@ -178,7 +207,7 @@ function renderRow(
   onDelete: SessionsProps["onDelete"],
   disabled: boolean,
 ) {
-  const updated = row.updatedAt ? formatAgo(row.updatedAt) : "n/a";
+  const updated = row.updatedAt ? formatAgo(row.updatedAt) : "―";
   const rawThinking = row.thinkingLevel ?? "";
   const isBinaryThinking = isBinaryThinkingProvider(row.modelProvider);
   const thinking = resolveThinkLevelDisplay(rawThinking, isBinaryThinking);
@@ -200,14 +229,14 @@ function renderRow(
         <input
           .value=${row.label ?? ""}
           ?disabled=${disabled}
-          placeholder="(optional)"
+          placeholder="（任意）"
           @change=${(e: Event) => {
             const value = (e.target as HTMLInputElement).value.trim();
             onPatch(row.key, { label: value || null });
           }}
         />
       </div>
-      <div>${row.kind}</div>
+      <div>${formatKind(row.kind)}</div>
       <div>${updated}</div>
       <div>${formatSessionTokens(row)}</div>
       <div>
@@ -222,7 +251,7 @@ function renderRow(
           }}
         >
           ${thinkLevels.map((level) =>
-            html`<option value=${level}>${level || "inherit"}</option>`,
+            html`<option value=${level.value}>${level.label}</option>`,
           )}
         </select>
       </div>
@@ -250,13 +279,13 @@ function renderRow(
           }}
         >
           ${REASONING_LEVELS.map((level) =>
-            html`<option value=${level}>${level || "inherit"}</option>`,
+            html`<option value=${level.value}>${level.label}</option>`,
           )}
         </select>
       </div>
       <div>
         <button class="btn danger" ?disabled=${disabled} @click=${() => onDelete(row.key)}>
-          Delete
+          削除
         </button>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { customElement, state } from "lit/decorators.js";
 import type { GatewayBrowserClient, GatewayHelloOk } from "./gateway";
 import { resolveInjectedAssistantIdentity } from "./assistant-identity";
 import { loadSettings, type UiSettings } from "./storage";
+import { initLocale } from "./i18n/index.js";
 import { renderApp } from "./app-render";
 import type { Tab } from "./navigation";
 import type { ResolvedTheme, ThemeMode } from "./theme";
@@ -274,6 +275,7 @@ export class OpenClawApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    initLocale(); // Initialize i18n
     handleConnected(this as unknown as Parameters<typeof handleConnected>[0]);
   }
 

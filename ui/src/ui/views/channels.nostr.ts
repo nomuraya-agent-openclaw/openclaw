@@ -14,7 +14,7 @@ import {
  * Truncate a pubkey for display (shows first and last 8 chars)
  */
 function truncatePubkey(pubkey: string | null | undefined): string {
-  if (!pubkey) return "n/a";
+  if (!pubkey) return "―";
   if (pubkey.length <= 20) return pubkey;
   return `${pubkey.slice(0, 8)}...${pubkey.slice(-8)}`;
 }
@@ -64,20 +64,20 @@ export function renderNostrCard(params: {
         </div>
         <div class="status-list account-card-status">
           <div>
-            <span class="label">Running</span>
-            <span>${account.running ? "Yes" : "No"}</span>
+            <span class="label">実行中</span>
+            <span>${account.running ? "はい" : "いいえ"}</span>
           </div>
           <div>
-            <span class="label">Configured</span>
-            <span>${account.configured ? "Yes" : "No"}</span>
+            <span class="label">設定済み</span>
+            <span>${account.configured ? "はい" : "いいえ"}</span>
           </div>
           <div>
-            <span class="label">Public Key</span>
+            <span class="label">公開鍵</span>
             <span class="monospace" title="${publicKey ?? ""}">${truncatePubkey(publicKey)}</span>
           </div>
           <div>
-            <span class="label">Last inbound</span>
-            <span>${account.lastInboundAt ? formatAgo(account.lastInboundAt) : "n/a"}</span>
+            <span class="label">最終受信</span>
+            <span>${account.lastInboundAt ? formatAgo(account.lastInboundAt) : "―"}</span>
           </div>
           ${account.lastError
             ? html`
@@ -117,7 +117,7 @@ export function renderNostrCard(params: {
     return html`
       <div style="margin-top: 16px; padding: 12px; background: var(--bg-secondary); border-radius: 8px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <div style="font-weight: 500;">Profile</div>
+          <div style="font-weight: 500;">プロフィール</div>
           ${summaryConfigured
             ? html`
                 <button
@@ -125,7 +125,7 @@ export function renderNostrCard(params: {
                   @click=${onEditProfile}
                   style="font-size: 12px; padding: 4px 8px;"
                 >
-                  Edit Profile
+                  プロフィール編集
                 </button>
               `
             : nothing}
@@ -138,7 +138,7 @@ export function renderNostrCard(params: {
                       <div style="margin-bottom: 8px;">
                         <img
                           src=${picture}
-                          alt="Profile picture"
+                          alt="プロフィール画像"
                           style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color);"
                           @error=${(e: Event) => {
                             (e.target as HTMLImageElement).style.display = "none";
@@ -147,19 +147,19 @@ export function renderNostrCard(params: {
                       </div>
                     `
                   : nothing}
-                ${name ? html`<div><span class="label">Name</span><span>${name}</span></div>` : nothing}
+                ${name ? html`<div><span class="label">名前</span><span>${name}</span></div>` : nothing}
                 ${displayName
-                  ? html`<div><span class="label">Display Name</span><span>${displayName}</span></div>`
+                  ? html`<div><span class="label">表示名</span><span>${displayName}</span></div>`
                   : nothing}
                 ${about
-                  ? html`<div><span class="label">About</span><span style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${about}</span></div>`
+                  ? html`<div><span class="label">自己紹介</span><span style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${about}</span></div>`
                   : nothing}
                 ${nip05 ? html`<div><span class="label">NIP-05</span><span>${nip05}</span></div>` : nothing}
               </div>
             `
           : html`
               <div style="color: var(--text-muted); font-size: 13px;">
-                No profile set. Click "Edit Profile" to add your name, bio, and avatar.
+                プロフィールが設定されていません。「プロフィール編集」をクリックして名前、自己紹介、アバターを追加してください。
               </div>
             `}
       </div>
@@ -169,7 +169,7 @@ export function renderNostrCard(params: {
   return html`
     <div class="card">
       <div class="card-title">Nostr</div>
-      <div class="card-sub">Decentralized DMs via Nostr relays (NIP-04).</div>
+      <div class="card-sub">Nostrリレー経由の分散型DM（NIP-04）。</div>
       ${accountCountLabel}
 
       ${hasMultipleAccounts
@@ -181,22 +181,22 @@ export function renderNostrCard(params: {
         : html`
             <div class="status-list" style="margin-top: 16px;">
               <div>
-                <span class="label">Configured</span>
-                <span>${summaryConfigured ? "Yes" : "No"}</span>
+                <span class="label">設定済み</span>
+                <span>${summaryConfigured ? "はい" : "いいえ"}</span>
               </div>
               <div>
-                <span class="label">Running</span>
-                <span>${summaryRunning ? "Yes" : "No"}</span>
+                <span class="label">実行中</span>
+                <span>${summaryRunning ? "はい" : "いいえ"}</span>
               </div>
               <div>
-                <span class="label">Public Key</span>
+                <span class="label">公開鍵</span>
                 <span class="monospace" title="${summaryPublicKey ?? ""}"
                   >${truncatePubkey(summaryPublicKey)}</span
                 >
               </div>
               <div>
-                <span class="label">Last start</span>
-                <span>${summaryLastStartAt ? formatAgo(summaryLastStartAt) : "n/a"}</span>
+                <span class="label">最終起動</span>
+                <span>${summaryLastStartAt ? formatAgo(summaryLastStartAt) : "―"}</span>
               </div>
             </div>
           `}
@@ -210,7 +210,7 @@ export function renderNostrCard(params: {
       ${renderChannelConfigSection({ channelId: "nostr", props })}
 
       <div class="row" style="margin-top: 12px;">
-        <button class="btn" @click=${() => props.onRefresh(false)}>Refresh</button>
+        <button class="btn" @click=${() => props.onRefresh(false)}>更新</button>
       </div>
     </div>
   `;

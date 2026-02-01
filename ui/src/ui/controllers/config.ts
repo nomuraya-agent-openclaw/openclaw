@@ -10,6 +10,7 @@ import {
   serializeConfigForm,
   setPathValue,
 } from "./config/form-utils";
+import { CONFIG_HINTS_JA } from "../i18n/config-hints-ja";
 
 export type ConfigState = {
   client: GatewayBrowserClient | null;
@@ -74,7 +75,18 @@ export function applyConfigSchema(
   res: ConfigSchemaResponse,
 ) {
   state.configSchema = res.schema ?? null;
-  state.configUiHints = res.uiHints ?? {};
+  // Merge server hints with Japanese translations (Japanese takes precedence)
+  const serverHints = res.uiHints ?? {};
+  const mergedHints: ConfigUiHints = { ...serverHints };
+  for (const [key, jaHint] of Object.entries(CONFIG_HINTS_JA)) {
+    if (mergedHints[key]) {
+      // Merge: Japanese overrides server values
+      mergedHints[key] = { ...mergedHints[key], ...jaHint };
+    } else {
+      mergedHints[key] = jaHint;
+    }
+  }
+  state.configUiHints = mergedHints;
   state.configSchemaVersion = res.version ?? null;
 }
 

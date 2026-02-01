@@ -16,46 +16,46 @@ export function renderWhatsAppCard(params: {
   return html`
     <div class="card">
       <div class="card-title">WhatsApp</div>
-      <div class="card-sub">Link WhatsApp Web and monitor connection health.</div>
+      <div class="card-sub">WhatsApp Webをリンクし、接続状態を監視します。</div>
       ${accountCountLabel}
 
       <div class="status-list" style="margin-top: 16px;">
         <div>
-          <span class="label">Configured</span>
-          <span>${whatsapp?.configured ? "Yes" : "No"}</span>
+          <span class="label">設定済み</span>
+          <span>${whatsapp?.configured ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Linked</span>
-          <span>${whatsapp?.linked ? "Yes" : "No"}</span>
+          <span class="label">リンク済み</span>
+          <span>${whatsapp?.linked ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Running</span>
-          <span>${whatsapp?.running ? "Yes" : "No"}</span>
+          <span class="label">実行中</span>
+          <span>${whatsapp?.running ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Connected</span>
-          <span>${whatsapp?.connected ? "Yes" : "No"}</span>
+          <span class="label">接続中</span>
+          <span>${whatsapp?.connected ? "はい" : "いいえ"}</span>
         </div>
         <div>
-          <span class="label">Last connect</span>
+          <span class="label">最終接続</span>
           <span>
             ${whatsapp?.lastConnectedAt
               ? formatAgo(whatsapp.lastConnectedAt)
-              : "n/a"}
+              : "―"}
           </span>
         </div>
         <div>
-          <span class="label">Last message</span>
+          <span class="label">最終メッセージ</span>
           <span>
-            ${whatsapp?.lastMessageAt ? formatAgo(whatsapp.lastMessageAt) : "n/a"}
+            ${whatsapp?.lastMessageAt ? formatAgo(whatsapp.lastMessageAt) : "―"}
           </span>
         </div>
         <div>
-          <span class="label">Auth age</span>
+          <span class="label">認証経過時間</span>
           <span>
             ${whatsapp?.authAgeMs != null
               ? formatDuration(whatsapp.authAgeMs)
-              : "n/a"}
+              : "―"}
           </span>
         </div>
       </div>
@@ -74,7 +74,7 @@ export function renderWhatsAppCard(params: {
 
       ${props.whatsappQrDataUrl
         ? html`<div class="qr-wrap">
-            <img src=${props.whatsappQrDataUrl} alt="WhatsApp QR" />
+            <img src=${props.whatsappQrDataUrl} alt="WhatsApp QRコード" />
           </div>`
         : nothing}
 
@@ -84,31 +84,31 @@ export function renderWhatsAppCard(params: {
           ?disabled=${props.whatsappBusy}
           @click=${() => props.onWhatsAppStart(false)}
         >
-          ${props.whatsappBusy ? "Working…" : "Show QR"}
+          ${props.whatsappBusy ? "処理中…" : "QRを表示"}
         </button>
         <button
           class="btn"
           ?disabled=${props.whatsappBusy}
           @click=${() => props.onWhatsAppStart(true)}
         >
-          Relink
+          再リンク
         </button>
         <button
           class="btn"
           ?disabled=${props.whatsappBusy}
           @click=${() => props.onWhatsAppWait()}
         >
-          Wait for scan
+          スキャン待機
         </button>
         <button
           class="btn danger"
           ?disabled=${props.whatsappBusy}
           @click=${() => props.onWhatsAppLogout()}
         >
-          Logout
+          ログアウト
         </button>
         <button class="btn" @click=${() => props.onRefresh(true)}>
-          Refresh
+          更新
         </button>
       </div>
 
